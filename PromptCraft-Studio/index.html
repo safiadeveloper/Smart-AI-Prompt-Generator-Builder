@@ -171,7 +171,109 @@ Guidelines:
     </div>
 
   </main>
+<script>
+    const templates = {
+      codeReview: {
+        role: "Senior Security & Performance Auditor",
+        task: "Review the provided code for security vulnerabilities, memory leaks, and performance bottlenecks.",
+        context: "Focus on OWASP top 10 risks and code efficiency.",
+        tone: "Strict & Critical",
+        format: "Bullet Points & Checklist"
+      },
+      bugFix: {
+        role: "Lead Software Architect",
+        task: "Analyze the crash log, locate the root cause of the exception, and provide a fix.",
+        context: "Ensure backward compatibility and handle edge cases.",
+        tone: "Concise & Direct",
+        format: "Clean Code Block with Explanations"
+      },
+      apiDesign: {
+        role: "RESTful API Designer",
+        task: "Design clean REST API endpoints for user authentication, profile updates, and role-based access.",
+        context: "Follow OpenAPI 3.0 conventions and JSON error responses.",
+        tone: "Professional & Technical",
+        format: "JSON Structure"
+      },
+      systemDesign: {
+        role: "Principal Systems Engineer",
+        task: "Draft a high-level system design for a real-time chat application handling 100k concurrent WebSocket connections.",
+        context: "Include database schema strategy, caching layer, and scaling bottlenecks.",
+        tone: "Step-by-step & Educational",
+        format: "Markdown Table"
+      }
+    };
 
+    function updatePrompt() {
+      const role = document.getElementById('role').value.trim();
+      const task = document.getElementById('task').value.trim();
+      const tone = document.getElementById('tone').value;
+      const format = document.getElementById('format').value;
+      const context = document.getElementById('context').value.trim();
+
+      let text = "";
+      if (role) text += `Act as a ${role}.\n\n`;
+      text += `Core Task:\n${task || '[Enter your main task details here]'}\n\n`;
+      
+      text += `Guidelines:\n`;
+      text += `- Tone: ${tone}\n`;
+      text += `- Output Format: ${format}\n`;
+      if (context) text += `- Constraints/Context: ${context}\n`;
+
+      const outputEl = document.getElementById('output-prompt');
+      outputEl.textContent = text;
+
+      // Stats
+      const chars = text.length;
+      const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+      const tokens = Math.ceil(chars / 4);
+
+      document.getElementById('stat-chars').textContent = chars;
+      document.getElementById('stat-words').textContent = words;
+      document.getElementById('stat-tokens').textContent = tokens;
+    }
+
+    function loadTemplate(key) {
+      const t = templates[key];
+      if (!t) return;
+
+      document.getElementById('role').value = t.role;
+      document.getElementById('task').value = t.task;
+      document.getElementById('context').value = t.context;
+      document.getElementById('tone').value = t.tone;
+      document.getElementById('format').value = t.format;
+
+      updatePrompt();
+    }
+
+    function optimizePrompt() {
+      const taskEl = document.getElementById('task');
+      if (!taskEl.value.trim()) {
+        taskEl.value = "Create a robust backend REST API service in Python with error handling.";
+      } else {
+        taskEl.value = `Refine and optimize: ${taskEl.value.trim()}. Ensure code handles errors gracefully and adheres to best practices.`;
+      }
+      updatePrompt();
+    }
+
+    function resetForm() {
+      document.getElementById('role').value = '';
+      document.getElementById('task').value = '';
+      document.getElementById('context').value = '';
+      document.getElementById('tone').selectedIndex = 0;
+      document.getElementById('format').selectedIndex = 0;
+      updatePrompt();
+    }
+
+    function copyPrompt() {
+      const promptText = document.getElementById('output-prompt').textContent;
+      navigator.clipboard.writeText(promptText).then(() => {
+        alert('Prompt copied to clipboard!');
+      });
+    }
+
+    // Initialize default prompt display
+    updatePrompt();
+  </script>
   
 </body>
 </html>
